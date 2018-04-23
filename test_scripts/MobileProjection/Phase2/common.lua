@@ -8,7 +8,6 @@ config.defaultProtocolVersion = 3
 local actions = require("user_modules/sequences/actions")
 local utils = require("user_modules/utils")
 local test = require("user_modules/dummy_connecttest")
-local events = require("events")
 
 --[[ Module ]]
 local m = actions
@@ -24,18 +23,13 @@ function m.setAppConfig(pAppId, pAppHMIType, pIsMedia)
 end
 
 function m.cleanSessions()
-  EXPECT_EVENT(events.disconnectedEvent, "Disconnected")
-  :Do(function()
-      utils.cprint(35, "Mobile disconnected")
-    end)
-  local function toRun()
-    for i = 1, m.getAppsCount() do
-      test.mobileSession[i] = nil
-      utils.cprint(35, "Mobile session " .. i .. " deleted")
-    end
-    test.mobileConnection:Close()
+  for i = 1, m.getAppsCount() do
+    test.mobileSession[i]:StopRPC()
+    :Do(function(_, d)
+        utils.cprint(35, "Mobile session " .. d.sessionId .. " deleted")
+        test.mobileSession[i] = nil
+      end)
   end
-  RUN_AFTER(toRun, 1000)
   utils.wait()
 end
 
