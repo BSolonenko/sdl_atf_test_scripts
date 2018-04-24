@@ -17,6 +17,14 @@ m.failedTCs = {}
 m.wait = utils.wait
 m.registerApp = m.registerAppWOPTU
 
+function m.activateApp(pAppId)
+  if not pAppId then pAppId = 1 end
+  local requestId = test.hmiConnection:SendRequest("SDL.ActivateApp", { appID = m.getHMIAppId(pAppId) })
+  test.hmiConnection:ExpectResponse(requestId)
+  m.getMobileSession(pAppId):ExpectNotification("OnHMIStatus", { hmiLevel = "FULL" })
+  utils.wait()
+end
+
 function m.setAppConfig(pAppId, pAppHMIType, pIsMedia)
   m.getConfigAppParams(pAppId).appHMIType = { pAppHMIType }
   m.getConfigAppParams(pAppId).isMediaApplication = pIsMedia
