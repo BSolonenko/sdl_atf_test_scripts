@@ -20,12 +20,12 @@ runner.testSettings.isSelfIncluded = false
 --[[ Local Variables ]]
 local testCases = {
   [001] = { a = true, f = false },
-  [002] = { a = true, f = nil },
-  [003] = { a = false, f = true },
-  [004] = { a = false, f = false },
-  [005] = { a = false, f = nil },
-  [006] = { a = nil, f = false },
-  [007] = { a = nil, f = nil }
+  -- [002] = { a = true, f = nil },
+  -- [003] = { a = false, f = true },
+  -- [004] = { a = false, f = false },
+  -- [005] = { a = false, f = nil },
+  -- [006] = { a = nil, f = false },
+  -- [007] = { a = nil, f = nil }
 }
 
 --[[ Local Function ]]

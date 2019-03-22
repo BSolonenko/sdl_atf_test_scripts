@@ -53,7 +53,7 @@ local function putFile(pParamsSend, pFile, pAppId)
   else
     cid = mobSession:SendRPC("PutFile", pParamsSend, "files/icon_png.png")
   end
-  mobSession:ExpectResponse(cid, { success = true, resultCode = "SUCCESS" })
+  mobSession:ExpectResponse(cid, { success = false, resultCode = "ENCRYPTION_NEEDED" })
 end
 
 local function putFileEncrypted(pParamsSend, pFile, pAppId)
@@ -80,7 +80,6 @@ runner.Step("Start SDL, init HMI", common.start)
 runner.Step("Register App", common.registerApp)
 runner.Step("Policy Table Update", common.policyTableUpdate, { ptUpdate })
 runner.Step("Activate App", common.activateApp)
-runner.Step("Put file, unprotected RPC, protected required", putFile)
 runner.Step("Start RPC Service protected", common.startServiceProtected, { 7 })
 
 runner.Title("Test")

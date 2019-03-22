@@ -34,7 +34,7 @@ runner.testSettings.isSelfIncluded = false
 --[[ Local Variables ]]
 local testCases = {
   [001] = { a = true, f = true },
-  [002] = { a = nil, f = true }
+  -- [002] = { a = nil, f = true }
 }
 
 --[[ Local Function ]]
@@ -49,8 +49,8 @@ local function onPermissionsChangeCheck(pApp, pFuncGroup)
   end)
 end
 
-local function registerApp(appId, pFuncGroup)
-  common.registerAppOnPermChange(appId, onPermissionsChangeCheck(pFuncGroup))
+local function registerApp(appId,pApp, pFuncGroup)
+  common.registerAppOnPermChange(appId, onPermissionsChangeCheck(pApp, pFuncGroup))
 end
 
 local function protectedRpcInProtectedModeEncryptedNotRequired()

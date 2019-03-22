@@ -4,7 +4,7 @@
 -- Description:
 -- Precondition:
 -- 1) Update preload_pt.json file and set value for app_policies = true and to the
---    appropriate function_group (Base-4) = false
+--    appropriate function_group (Base-4) = true
 -- In case:
 -- 1) App registered
 -- SDL does:
@@ -13,7 +13,7 @@
 -- SDL does:
 -- 1) send response with resultCode = SUCCESS to mobile application
 -- 2) send OnPermissionsChange nitification with parameters for app_policies requireEncryption = true,
---    function_group requireEncryption = false
+--    function_group requireEncryption = true
 -- In case:
 -- 2)RPC service 7 is started in protected mode
 -- 2.1) mobile application sends encrypted RPC request (AddCommand) to SDL
@@ -22,7 +22,7 @@
 -- 2) HMI sends (AddCommand) RPC response with resultCode = SUCCESS to SDL
 -- SDL does:
 -- 1) send encrypted response (AddCommand) to mobile application with result code “Success”
--- 2) send unencrypted notification (OnHashChange)
+-- 2) send encrypted notification (OnHashChange)
 ---------------------------------------------------------------------------------------------------
 --[[ Required Shared libraries ]]
 local runner = require('user_modules/script_runner')
@@ -33,19 +33,13 @@ runner.testSettings.isSelfIncluded = false
 
 --[[ Local Variables ]]
 local testCases = {
-  [001] = { a = true, f = false },
-  -- [002] = { a = true, f = nil },
-  -- [003] = { a = false, f = true },
-  -- [004] = { a = false, f = false },
-  -- [005] = { a = false, f = nil },
-  -- [006] = { a = nil, f = false },
-  -- [007] = { a = nil, f = nil }
+  -- [001] = { a = true, f = true },
+  [002] = { a = nil, f = true }
 }
 
 --[[ Local Function ]]
-local function onPermissionsChangeCheck(pApp, pFuncGroup)
+local function onPermissionsChangeCheck(pApp,pApp, pFuncGroup)
   if pApp == nil then pApp = true end
-  if pFuncGroup == nil then pFuncGroup = false end
   common.getMobileSession():ExpectNotification("OnPermissionsChange")
   :ValidIf(function(_,data)
     if data.payload.requireEncryption == pApp and data.payload.permissionItem[1].requireEncryption == pFuncGroup then
@@ -56,7 +50,7 @@ local function onPermissionsChangeCheck(pApp, pFuncGroup)
 end
 
 local function registerApp(appId,pApp, pFuncGroup)
-  common.registerAppOnPermChange(appId, onPermissionsChangeCheck(pApp, pFuncGroup))
+  common.registerAppOnPermChange(appId, onPermissionsChangeCheck(pApp,pApp, pFuncGroup))
 end
 
 local function protectedRpcInProtectedModeEncryptedNotRequired()
@@ -73,7 +67,7 @@ local function protectedRpcInProtectedModeEncryptedNotRequired()
     common.getHMIConnection():SendResponse(data.id, data.method, "SUCCESS", { })
     end)
     common.getMobileSession():ExpectEncryptedResponse(cid, { success = true, resultCode = "SUCCESS" })
-    common.getMobileSession():ExpectNotification("OnHashChange")
+    common.getMobileSession():ExpectEncryptedNotification("OnHashChange")
 end
 
 --[[ Scenario ]]

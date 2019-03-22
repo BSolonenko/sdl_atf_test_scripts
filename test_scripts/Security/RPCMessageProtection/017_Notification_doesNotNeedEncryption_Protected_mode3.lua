@@ -4,11 +4,11 @@
 
 -- Description:
 -- Check that after the encryption of RPC service 7 is enabled (encryption is available)
--- SDL sends an encrypted notification if the RPC needs protection.
+-- SDL sends an unencrypted notification if the RPC does not need protection.
 
 -- Sequence:
 -- 1) The HMI sends RPC notification to the SDL
--- a. SDL send encrypted notification to mobile application.
+-- a. SDL send unencrypted notification to mobile application.
 ---------------------------------------------------------------------------------------------------
 --[[ Required Shared libraries ]]
 local runner = require('user_modules/script_runner')
@@ -19,14 +19,19 @@ runner.testSettings.isSelfIncluded = false
 
 --[[ Local Variables ]]
 local testCases = {
-  [001] = { a = true, f = true },
-  -- [002] = { a = nil, f = true }
+  -- [001] = { a = true, f = false },
+  -- [002] = { a = true, f = nil },
+  -- [003] = { a = false, f = true },
+  [004] = { a = false, f = false },
+  -- [005] = { a = false, f = nil },
+  -- [006] = { a = nil, f = false },
+  -- [007] = { a = nil, f = nil }
 }
 
 --[[ Local Function ]]
 local function sendOnLanguageChange()
   common.getHMIConnection():SendNotification("UI.OnLanguageChange", {language = "EL-GR"} )
-  common.getMobileSession():ExpectEncryptedNotification("OnLanguageChange",
+  common.getMobileSession():ExpectNotification("OnLanguageChange",
     {hmiDisplayLanguage = "EL-GR", language = "EN-US"} )
 end
 
@@ -44,7 +49,7 @@ for _, tc in common.spairs(testCases) do
   runner.Step("Start RPC Service protected", common.startServiceProtected, { 7 })
 
   runner.Title("Test")
-  runner.Step("OnLanguageChange in protected mode, param for App="..tostring(tc.a)..",for Gruop="..tostring(tc.f),
+  runner.Step("Send OnLanguageChange in protected mode, param for App="..tostring(tc.a)..",for Gruop="..tostring(tc.f),
     sendOnLanguageChange)
 
   runner.Title("Postconditions")

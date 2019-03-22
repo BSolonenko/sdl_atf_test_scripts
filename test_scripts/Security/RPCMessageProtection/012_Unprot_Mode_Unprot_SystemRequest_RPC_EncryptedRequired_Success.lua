@@ -49,11 +49,7 @@ end
 
 local function unprotSystemRequestInUnprotModeEncryptedRequired()
   local cid = common.getMobileSession():SendRPC("SystemRequest", param, file)
-  common.getHMIConnection():ExpectRequest("BasicCommunication.SystemRequest")
-  :Do(function(_,data)
-    common.getHMIConnection():SendResponse(data.id,"BasicCommunication.SystemRequest", "SUCCESS", {})
-  end)
-  common.getMobileSession():ExpectResponse(cid, { success = true, resultCode = "SUCCESS"})
+  common.getMobileSession():ExpectResponse(cid, { success = false, resultCode = "ENCRYPTION_NEEDED"})
 end
 
 --[[ Scenario ]]
@@ -63,8 +59,6 @@ runner.Step("Start SDL, init HMI", common.start)
 runner.Step("Register App", common.registerApp)
 runner.Step("Policy Table Update", common.policyTableUpdate, { ptUpdate })
 runner.Step("Activate App", common.activateApp)
-runner.Step("Unprotected System request, unprotected mod, encrypted required",
-  unprotSystemRequestInUnprotModeEncryptedRequired)
 
 runner.Title("Test")
 runner.Step("Start RPC Service protected", common.startServiceProtected, { 7 })

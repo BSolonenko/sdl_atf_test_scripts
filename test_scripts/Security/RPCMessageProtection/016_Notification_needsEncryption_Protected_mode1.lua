@@ -19,8 +19,8 @@ runner.testSettings.isSelfIncluded = false
 
 --[[ Local Variables ]]
 local testCases = {
-  [001] = { a = true, f = true },
-  -- [002] = { a = nil, f = true }
+  -- [001] = { a = true, f = true },
+  [002] = { a = nil, f = true }
 }
 
 --[[ Local Function ]]
